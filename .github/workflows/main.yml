@@ -1,0 +1,37 @@
+name: Daily Run
+
+on:
+  schedule:
+    - cron: '0 19 * * *'  # Runs daily at 7:00 PM UTC
+  workflow_dispatch:  # Allows manual triggering of the workflow
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: '1.21'  # Using a more stable Go version
+
+      - name: Run Go Script
+        env:
+          HASURA_ENDPOINT: ${{ secrets.HASURA_ENDPOINT }}
+          ADMIN_SECRET: ${{ secrets.ADMIN_SECRET }}
+        run: go run main.go
+
+      - name: Check for changes and commit
+        run: |
+          git add productsfashionaccessories.xml
+          if git diff --staged --quiet; then
+            echo "No changes to commit."
+          else
+            git config --local user.email "action@github.com"
+            git config --local user.name "GitHub Action"
+            git commit -m "Update productsfashionaccessories.xml"
+            git push https://${{ secrets.GH_PAT }}@github.com/${{ github.repository }}.git HEAD:${{ github.ref }}
+          fi
