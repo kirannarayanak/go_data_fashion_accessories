@@ -74,7 +74,7 @@ func FetchAds(endpoint, adminSecret string) ([]AdItem, error) {
 `)
 
 	// Calculate the timestamp for the last 24 hours
-	last24Hours := time.Now().Add(-2206 * time.Hour).Format(time.RFC3339)
+	last24Hours := time.Now().Add(-24 * time.Hour).Format(time.RFC3339)
 	req.Var("last24Hours", last24Hours)
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("X-Hasura-Admin-Secret", adminSecret)
